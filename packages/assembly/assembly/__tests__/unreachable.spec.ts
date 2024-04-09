@@ -16,7 +16,7 @@ describe("unreachable", () => {
    * expected to throw.
    */
   throws(
-    "when garunteed unreachable",
+    "when guaranteed unreachable",
     () => {
       counter = 1;
       unreachable();
@@ -33,6 +33,17 @@ describe("unreachable", () => {
       counter = 1;
       unreachable();
     }).toThrow("unreachable instructions should throw.");
+  });
+
+  /**
+   * This test verifies that an unreachable() instruction causes the toThrowWith assertion to
+   * be valid.
+   */
+  it("should should throw with", () => {
+    expect(() => {
+      counter = 1;
+      throw new Error("I'm throwin this message: expected error message");
+    }).toThrowWith("expected error message", "unreachable instructions should throw.");
   });
 
   /**

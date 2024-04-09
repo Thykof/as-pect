@@ -46,7 +46,7 @@ describe("example test", () => {
   });
 
   /**
-   * This test increases the test count, and is garunteed to throw by using an `unreachable()`
+   * This test increases the test count, and is guaranteed to throw by using an `unreachable()`
    * instruction.
    */
   throws("this test should run", () => {
@@ -60,7 +60,7 @@ describe("example test", () => {
  * blocks. The first describe block runs three fake tests, to call the control flow functions. Each
  * control flow function increments a value, and those values are tested below.
  *
- * This test group actually tests the control flow values. It is garunteed to run after the first
+ * This test group actually tests the control flow values. It is guaranteed to run after the first
  * test suite in this file, and therefore it should have modified the globals.
  */
 describe("flow", () => {

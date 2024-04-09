@@ -265,7 +265,7 @@ export class Reflect {
 
         // loop over each value and push it to the reflected value
         for (let i = 0; i < length; i++) {
-          // @ts-ignore index signature is garunteed at this point
+          // @ts-ignore index signature is guaranteed at this point
           let arrayValue = unchecked(value[i]);
           let reflectedArrayValueID = Reflect.toReflectedValue(
             arrayValue,
