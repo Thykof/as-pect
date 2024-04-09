@@ -219,7 +219,25 @@ declare class Expectation<T> {
   toThrow(message?: string): void;
 
   /**
-   * This expecation asserts that the value is truthy, like in javascript. If the value is a string,
+   * If the value is callable, it calls the function, and fails the expectation if it throws with the wrong
+   * error message, or hits an unreachable().
+   *
+   * @param {string} expectThrowMessage - The expected message that should be thrown.
+   * @param {string} message - The optional message that describes the expectation.
+   *
+   * @example
+   *
+   * ```ts
+   * expectFn((): void => unreachable()).toThrowWith("unreachable() should throw.");
+   * expectFn((): void => {
+   *   cat.sleep(100); // cats can sleep quite a lot
+   * }).not.toThrowWith("another error message", "cats should sleep, not throw");
+   * ```
+   */
+  toThrowWith(expectThrowMessage: string, message?: string): void;
+
+  /**
+   * This expectation asserts that the value is truthy, like in javascript. If the value is a string,
    * then strings of length 0 are not truthy.
    *
    * @param {string} message - The optional message that describes the expectation.

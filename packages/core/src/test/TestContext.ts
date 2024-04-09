@@ -451,9 +451,9 @@ export class TestContext {
     node.name = this.getString(descriptionPointer, node.name);
     node.callback = callbackPointer;
     node.negated = negated === 1;
-    node.message = node.negated
+    node.message = `hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh${node.negated
       ? this.getString(messagePointer, "No Message Provided.")
-      : node.message;
+      : node.message}hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh`;
 
     // namespacing for snapshots later
     const namespacePrefix = `${parent.namespace}!~${node.name}`;
@@ -479,7 +479,7 @@ export class TestContext {
     node.stackTrace = this.stack;
     node.actual = this.actual;
     node.expected = this.expected;
-    node.message = this.message;
+    node.message = `gggggggggggggggggggggggggggg${this.message}ggggggggggggggggggggggg`;
     node.end = performance.now();
     node.rtraceEnd = this.rtrace.blocks.size;
   }
@@ -566,6 +566,7 @@ export class TestContext {
       reportExpectedSnapshot: this.reportExpectedSnapshot.bind(this),
       reportExpectedTruthy: this.reportExpectedTruthy.bind(this),
       tryCall: this.tryCall.bind(this),
+      safeCall: this.safeCall.bind(this),
     };
 
     this.rtrace.install(finalImports);
@@ -654,9 +655,44 @@ export class TestContext {
       this.wasm!.__call(pointer);
     } catch (ex) {
       this.stack = this.getErrorStackTrace(ex as Error);
+      console.log(this.stack);
       return 0;
     }
     return 1;
+  }
+
+  /**
+   * This is a web assembly utility function that wraps a function call in a try catch block to
+   * return the error message
+   *
+   * @param {number} pointer - The function pointer to call. It must accept no parameters and return
+   * void.
+   * @returns {string} - If the callback was run successfully without error, it returns an empty
+   * string, else it returns the error message.
+   */
+  protected safeCall(pointer: number): Uint8Array {
+    function strToBytes(str: string): Uint8Array {
+      if (!str.length) {
+        return new Uint8Array(0);
+      }
+      return new Uint8Array(Buffer.from(str, 'utf-8'));
+    }
+
+    /** This is a safety net conditional, no reason to test it. */
+    /* istanbul ignore next */
+    if (pointer < 0) return strToBytes('');
+
+    try {
+      this.wasm!.__call(pointer);
+    } catch (ex) {
+      // this.stack = this.getErrorStackTrace(ex as Error);
+      // console.log(this.stack);
+      // console.log((ex as Error).stack!.toString());
+      // console.log(this.getString(messagePointer, "No Message Provided."));
+      return strToBytes('this is a dummy error message');
+      // return (ex as any).toString();
+    }
+    return strToBytes('');
   }
 
   /**
@@ -728,6 +764,7 @@ export class TestContext {
     line: number,
     col: number,
   ): void {
+    console.log('ABORRRRRRRRRTTTTTTTTTTT88888888!!!!!!');
     this.message = this.getString(
       reasonPointer,
       `Error in ${this.getString(

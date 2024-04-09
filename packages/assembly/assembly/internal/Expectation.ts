@@ -9,6 +9,10 @@ import { assert } from "./assert";
 declare function tryCall(func: () => void): bool;
 
 // @ts-ignore: Decorators *are* valid here
+@external("__aspect", "safeCall")
+declare function safeCall(func: () => void): StaticArray<u8>;
+
+// @ts-ignore: Decorators *are* valid here
 @global
 export class Expectation<T> {
   /**
@@ -149,7 +153,7 @@ export class Expectation<T> {
     if (!isFunction(this.actual))
       // @as-covers: ignore because this is a compile time error
       ERROR(
-      "Expectation#toThrow assertion called on actual T where T is not a function reference",
+        "Expectation#toThrow assertion called on actual T where T is not a function reference",
       );
     if (idof<T>() != idof<() => void>())
       // @as-covers: ignore because this is a compile time error
@@ -162,6 +166,46 @@ export class Expectation<T> {
     Actual.report(throws ? "Throws" : "Not Throws");
     Expected.report("Throws", negated);
     assert(negated ^ throws, message);
+    Actual.clear();
+    Expected.clear();
+  }
+
+  public toThrowWith(expectThrowMessage: string, message: string = ""): void {
+    function bytesToString(arr: StaticArray<u8>): string {
+      if (!arr.length) {
+        return '';
+      }
+      return String.UTF8.decode(changetype<ArrayBuffer>(arr));
+    }
+
+    let actual = this.actual;
+    let negated = this._not;
+
+    if (!isFunction(this.actual))
+      // @as-covers: ignore because this is a compile time error
+      ERROR(
+        "Expectation#toThrow assertion called on actual T where T is not a function reference",
+      );
+    if (idof<T>() != idof<() => void>())
+      // @as-covers: ignore because this is a compile time error
+      ERROR(
+        "Expectation#toThrow assertion called on actual T where T is not a function reference with signature () => void",
+      );
+
+    // @ts-ignore: safe safeCall
+    const resultBytes = safeCall(actual);
+    log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');log(resultBytes);
+    const result = bytesToString(safeCall(actual));
+    log('===============================================================================' + result);
+    const validThrow = result == expectThrowMessage;
+    if (result === '') {
+      // the call is a success, but it should have thrown
+      Actual.report("Not Throws");
+    } else {
+      Actual.report(validThrow ? "Throws with correct error message" : `Throws with incorrect error message: ${result}`);
+    }
+    Expected.report(`Throws with ${expectThrowMessage}`, negated);
+    assert(negated ^ i32(validThrow), message);
     Actual.clear();
     Expected.clear();
   }
