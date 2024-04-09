@@ -369,7 +369,7 @@ declare class Expectation<T> {
   toBeNull(message?: string): void;
 
   /**
-   * This expecation assert that the value is falsy, like in javascript. If the value is a string,
+   * This expectation assert that the value is falsy, like in javascript. If the value is a string,
    * then strings of length 0 are falsy.
    *
    * @param {string} message - The optional message that describes the expectation.
